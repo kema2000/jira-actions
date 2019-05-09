@@ -16,6 +16,8 @@ import com.atlassian.performance.tools.jiraactions.api.memories.adaptive.Adaptiv
 import com.atlassian.performance.tools.jiraactions.api.memories.adaptive.AdaptiveJqlMemory
 import com.atlassian.performance.tools.jiraactions.api.memories.adaptive.AdaptiveProjectMemory
 import com.atlassian.performance.tools.jiraactions.api.w3c.DisabledW3cPerformanceTimeline
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import java.time.Clock
@@ -28,34 +30,12 @@ import java.util.*
  *      AddComment
  */
 class RichTextEditorIT {
+    private val logger: Logger = LogManager.getLogger(this::class.java)
 
     @Test
     fun shouldRunScenarioWithoutErrors() {
-
-        /**
-         * Original intention was to test multiple JIRA version in one test case.
-         *
-         * This is not working now due to:
-         * 1. the static network alias is used
-         * 2. the jira.close() does not release the resource properly yet
-         *
-         * So we will keep it for one version per run now.
-         */
-        val versions = listOf(
-            "8.0.0"
-//            "7.13.0"
-//            "7.3.0"
-//            "7.2.0"
-        )
-        var basePort = 8080;
-
-        for (version in versions) {
-            runTestOnOneInstance(version, basePort++)
-        }
-    }
-
-    private fun runTestOnOneInstance(version: String, port : Int) {
-        println("Testing JIRA with port : $port, version : $version")
+        val version = System.getenv("JIRA_SOFTWARE_VERSION") ?: "8.0.0"
+        logger.info("Testing Jira $version")
         val scenario = JiraEditScenario()
         val metrics = mutableListOf<ActionMetric>()
         val actionMeter = ActionMeter(
@@ -74,9 +54,9 @@ class RichTextEditorIT {
                 throw Exception("not implemented")
             }
         }
+
         JiraCoreFormula.Builder()
             .version(version)
-            .port(port)
             .build()
             .provision()
             .use { jira ->
@@ -102,17 +82,17 @@ class RichTextEditorIT {
                         action.run()
                     }
                 }
-                jira.close()
             }
 
         val results = metrics.map { metric ->
             metric.result
         }
         Assertions.assertThat(results).containsOnly(ActionResult.OK)
+
     }
 }
 
-class JiraEditScenario constructor() : Scenario {
+class JiraEditScenario : Scenario {
 
     override fun getActions(jira: WebJira, seededRandom: SeededRandom, meter: ActionMeter): List<Action> {
         val projectMemory = AdaptiveProjectMemory(random = seededRandom)
@@ -158,6 +138,5 @@ class JiraEditScenario constructor() : Scenario {
             addComment
         )
     }
-
 
 }
