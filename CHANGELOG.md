@@ -81,6 +81,11 @@ Dropping a requirement of a major version of a dependency is a new contract.
 
 [JPERF-395]: https://ecosystem.atlassian.net/browse/JPERF-395
 
+### Fixed - 2019-02-27
+- Support RTE with a fallback to plain-text editor. Resolve [JPERF-184]
+
+[JPERF-184]: https://ecosystem.atlassian.net/browse/JPERF-184
+
 ## [3.3.0] - 2019-01-29
 [3.3.0]: https://github.com/atlassian/jira-actions/compare/release-3.2.0...release-3.3.0
 
