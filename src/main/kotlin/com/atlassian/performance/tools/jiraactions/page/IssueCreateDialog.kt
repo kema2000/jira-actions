@@ -53,10 +53,14 @@ internal class IssueCreateDialog(
         return this
     }
 
+    /**
+     * Click 'Configure Fields' to display 'All' to ensure
+     * all mandatory fields are displayed in creation dialog.
+     *
+     */
     fun fillRequiredFields(): IssueCreateDialog {
-
         driver.wait(elementToBeClickable(configColumnField)).click()
-        val locator = By.xpath("//div[@class='qf-picker-header']/dl/dd/a[text()='All']")
+        val locator = By.xpath("//div[@id='inline-dialog-field_picker_popup']//a[text()='All']")
         if (driver.isElementPresent(locator)) {
             driver.wait(elementToBeClickable(locator)).click()
         } else {
@@ -72,6 +76,10 @@ internal class IssueCreateDialog(
         driver.wait(Duration.ofSeconds(30), invisibilityOfElementLocated(By.className("aui-blanket")))
     }
 
+    /**
+     * 'resolution' field is mandatory for one of the xlarge datasets.
+     *
+     */
     private fun selectResolution() {
         if (driver.isElementPresent(resolutionField)) {
             val dropDown = Select(driver.findElement(resolutionField))
