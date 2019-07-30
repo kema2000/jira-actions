@@ -80,20 +80,4 @@ internal class IssueCreateDialog(
         this.fillAddtionalRequiredFields = fillAddtionalRequiredFields
         return this
     }
-
-    /**
-     * 'resolution' field is mandatory for one of the xlarge datasets.
-     *
-     */
-    private fun selectResolution() {
-        val resolutionField = By.id("resolution")
-        if (driver.isElementPresent(resolutionField)) {
-            val dropDown = Select(driver.findElement(resolutionField))
-            if (dropDown.options != null && dropDown.options.size > 1) {
-                val selection = dropDown.options.get(1)
-                dropDown.selectByVisibleText(selection.text)
-            }
-        }
-    }
-
 }
