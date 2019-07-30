@@ -8,11 +8,13 @@ import com.atlassian.performance.tools.jiraactions.api.measure.ActionMeter
 import com.atlassian.performance.tools.jiraactions.api.memories.IssueMemory
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.openqa.selenium.WebDriver
 
 class EditIssueAction(
     private val jira: WebJira,
     private val meter: ActionMeter,
-    private val issueMemory: IssueMemory
+    private val issueMemory: IssueMemory,
+    private val preSubmit: (driver: WebDriver) -> Unit = fun(driver: WebDriver) {}
 ) : Action {
     private val logger: Logger = LogManager.getLogger(this::class.java)
 
@@ -26,6 +28,7 @@ class EditIssueAction(
             val editIssueForm = jira
                 .goToEditIssue(issue.id)
                 .waitForEditIssueForm()
+                .fillAddtionalRequiredFields(preSubmit)
                 .fillForm()
             meter.measure(
                 key = EDIT_ISSUE_SUBMIT,

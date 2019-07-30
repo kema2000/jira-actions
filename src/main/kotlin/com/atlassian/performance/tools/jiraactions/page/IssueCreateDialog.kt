@@ -19,7 +19,7 @@ internal class IssueCreateDialog(
     private val projectField = SingleSelect(driver, By.id("project-field"))
     private val issueTypeField = SingleSelect(driver, By.id("issuetype-field"))
     private val configColumnField = By.id("qf-field-picker-trigger")
-    private val resolutionField = By.id("resolution")
+    private var fillAddtionalRequiredFields: (driver: WebDriver) -> Unit = fun(driver: WebDriver) {}
 
     fun waitForDialog(): IssueCreateDialog {
         val jiraErrors = JiraErrors(driver)
@@ -67,7 +67,7 @@ internal class IssueCreateDialog(
             driver.wait(elementToBeClickable(configColumnField)).click()
         }
         form.fillRequiredFields()
-        selectResolution()
+        fillAddtionalRequiredFields(driver)
         return this
     }
 
@@ -76,11 +76,17 @@ internal class IssueCreateDialog(
         driver.wait(Duration.ofSeconds(30), invisibilityOfElementLocated(By.className("aui-blanket")))
     }
 
+    fun fillAddtionalRequiredFields(fillAddtionalRequiredFields: (driver: WebDriver) -> Unit): IssueCreateDialog {
+        this.fillAddtionalRequiredFields = fillAddtionalRequiredFields
+        return this
+    }
+
     /**
      * 'resolution' field is mandatory for one of the xlarge datasets.
      *
      */
     private fun selectResolution() {
+        val resolutionField = By.id("resolution")
         if (driver.isElementPresent(resolutionField)) {
             val dropDown = Select(driver.findElement(resolutionField))
             if (dropDown.options != null && dropDown.options.size > 1) {

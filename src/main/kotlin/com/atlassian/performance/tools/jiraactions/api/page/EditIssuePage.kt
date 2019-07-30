@@ -4,7 +4,6 @@ import com.atlassian.performance.tools.jiraactions.api.page.form.IssueForm
 import org.openqa.selenium.By
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.support.ui.ExpectedConditions.*
-import org.openqa.selenium.support.ui.Select
 import java.time.Duration
 
 class EditIssuePage(
@@ -14,7 +13,7 @@ class EditIssuePage(
     private val summaryLocator = By.id("summary")
     private val updateButtonLocator = By.id("issue-edit-submit")
     private val descriptionFieldLocator = By.id("description")
-    private val resolutionLocator = By.id("resolution")
+    private var fillAddtionalRequiredFields: (driver: WebDriver) -> Unit = fun(driver: WebDriver) {}
 
     fun waitForEditIssueForm(): EditIssuePage {
         val jiraErrors = JiraErrors(driver)
@@ -38,18 +37,13 @@ class EditIssuePage(
                 .overwriteIfPresent("description")
         }
         form.fillRequiredFields()
-        selectResolution()
+        fillAddtionalRequiredFields(driver)
         return this
     }
 
-    private fun selectResolution() {
-        if (driver.isElementPresent(resolutionLocator)) {
-            val dropDown = Select(driver.findElement(resolutionLocator))
-            if(dropDown.options != null && dropDown.options.size > 1){
-                val selection = dropDown.options.get(1)
-                dropDown.selectByVisibleText(selection.text)
-            }
-        }
+    fun fillAddtionalRequiredFields(fillAddtionalRequiredFields: (driver: WebDriver) -> Unit): EditIssuePage {
+        this.fillAddtionalRequiredFields = fillAddtionalRequiredFields
+        return this
     }
 
     fun submit(): IssuePage {

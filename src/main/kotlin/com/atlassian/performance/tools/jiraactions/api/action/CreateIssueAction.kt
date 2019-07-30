@@ -5,12 +5,14 @@ import com.atlassian.performance.tools.jiraactions.api.measure.ActionMeter
 import com.atlassian.performance.tools.jiraactions.api.memories.ProjectMemory
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
+import org.openqa.selenium.WebDriver
 
 class CreateIssueAction(
     private val jira: WebJira,
     private val meter: ActionMeter,
     private val projectMemory: ProjectMemory,
-    private val seededRandom: SeededRandom
+    private val seededRandom: SeededRandom,
+    private val preSubmit: (driver: WebDriver) -> Unit = fun(driver: WebDriver) {}
 ) : Action {
     private val logger: Logger = LogManager.getLogger(this::class.java)
 
@@ -25,6 +27,7 @@ class CreateIssueAction(
                 jira.goToDashboard().waitForDashboard()
             }
             val issueCreateDialog = dashboardPage.openIssueCreateDialog()
+                .fillAddtionalRequiredFields(preSubmit)
             val filledForm = issueCreateDialog
                 .waitForDialog()
                 .selectProject(project.name)
